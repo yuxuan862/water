@@ -3,205 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅行規劃師 - Travel Planner Vibe</title>
-    <!-- Tailwind CSS -->
+    <title>旅行規劃師 (Travel Planner Vibe)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'PingFang TC', 'Microsoft JhengHei', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#4F46E5', // indigo-600
+                        secondary: '#F59E0B', // amber-500
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body { font-family: 'Inter', 'Microsoft JhengHei', sans-serif; }
+        body {
+            font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: #F8FAFC;
+            background-image: radial-gradient(circle at top right, #E0E7FF 0%, transparent 40%),
+                              radial-gradient(circle at bottom left, #FEF3C7 0%, transparent 40%);
+            background-attachment: fixed;
+        }
+        
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background-color: rgba(255, 255, 255, 0.8);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #4F46E5;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+<body class="text-slate-800 min-h-screen flex flex-col">
 
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-2xl">🧭</span>
-                <h1 class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-amber-500 bg-clip-text text-transparent">旅行規劃師 Travel-Planner-Vibe</h1>
-            </div>
-            <div class="flex items-center space-x-3">
-                <div id="userInfoBadge" class="hidden text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-xl flex items-center space-x-2">
-                    <span id="userEmailDisplay">未登入</span>
-                    <button onclick="logout()" class="text-indigo-600 hover:text-indigo-800 ml-2">登出</button>
-                </div>
-                <button id="loginOpenBtn" onclick="toggleAuthModal(true)" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition shadow-sm">
-                    🔐 登入 / 註冊
-                </button>
-                <button id="historyBtn" onclick="toggleHistoryModal(true)" class="px-4 py-2 text-sm font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition">
-                    📜 歷史行程
-                </button>
-            </div>
+    <nav class="glass-card sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">🔮</span>
+            <h1 class="text-xl font-bold text-slate-800">
+                <span data-i18n="navTitle">旅行規劃師</span> 
+                <span class="text-sm font-normal text-slate-500 hidden sm:inline" data-i18n="navSubtitle">| Travel Planner Vibe</span>
+            </h1>
         </div>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 flex-grow w-full">
-        
-        <!-- Left Panel: Input & Preferences Form -->
-        <section class="lg:col-span-5 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200 shadow-sm h-fit">
-            <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                <span class="mr-2">⚙️</span> 設定您的旅遊條件
-            </h2>
-            <form id="plannerForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">目的地 (Destination)</label>
-                    <input type="text" id="destination" required placeholder="例如：台南市中西區" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">出遊日期</label>
-                        <input type="date" id="tripDate" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">總預算 (TWD)</label>
-                        <input type="number" id="budgetTotal" required value="3000" min="500" step="100" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-2">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">同行人數</label>
-                        <input type="number" id="pax" required value="2" min="1" max="20" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">出發時間</label>
-                        <input type="time" id="departureTime" value="09:00" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">返回時間</label>
-                        <input type="time" id="returnTime" value="21:00" class="w-full px-3 py-2 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">出發起點</label>
-                    <input type="text" id="origin" placeholder="例如：台南火車站" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">主要交通方式</label>
-                    <select id="transportMode" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500">
-                        <option value="機車">騎車 / 機車</option>
-                        <option value="大眾運輸">大眾運輸 (公車/捷運)</option>
-                        <option value="開車">開車 / 租車</option>
-                        <option value="步行">步行漫遊</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">旅遊類型偏好 (可多選)</label>
-                    <div class="flex flex-wrap gap-2 pt-1" id="travelTypesContainer">
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="美食" checked class="mr-1"> 美食</label>
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="文化" checked class="mr-1"> 文化</label>
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="自然" class="mr-1"> 自然</label>
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="購物" class="mr-1"> 購物</label>
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="文青" checked class="mr-1"> 文青</label>
-                        <label class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm cursor-pointer select-none transition"><input type="checkbox" name="travelTypes" value="歷史" class="mr-1"> 歷史</label>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">旅遊風格</label>
-                        <select id="travelStyle" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
-                            <option value="放鬆慢活">放鬆慢活</option>
-                            <option value="緊湊充實">緊湊充實</option>
-                            <option value="打卡拍照">打卡拍照</option>
-                            <option value="極限冒險">極限冒險</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">同行對象</label>
-                        <select id="companion" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500">
-                            <option value="情侶">情侶約會</option>
-                            <option value="朋友">朋友出遊</option>
-                            <option value="獨旅">獨自旅行</option>
-                            <option value="家庭">家庭親子</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="submit" id="generateBtn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 transition flex items-center justify-center space-x-2">
-                    <span>✨ 開始生成智慧一日行程</span>
-                </button>
-            </form>
-        </section>
-
-        <section class="lg:col-span-7 flex flex-col space-y-6">
+        <div class="flex items-center gap-4">
+            <select id="lang-switcher" class="text-sm font-medium border border-slate-300 text-slate-600 rounded-lg px-2 py-1 bg-white/80 outline-none hover:border-primary transition-colors focus:ring-2 focus:ring-primary/20">
+                <option value="zh-TW">繁體中文</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="ko">한국어</option>
+            </select>
             
-            <!-- Welcome / Empty State -->
-            <div id="emptyState" class="bg-white/80 backdrop-blur-md rounded-2xl p-12 border border-slate-200 text-center flex flex-col items-center justify-center flex-grow shadow-sm">
+            <button id="btn-login-nav" class="text-slate-600 hover:text-primary transition-colors flex items-center gap-2 font-medium">
+                <i class="fas fa-user-circle"></i> <span class="hidden sm:inline" data-i18n="navLogin">登入</span>
+            </button>
+            <div id="user-profile-nav" class="hidden items-center gap-3">
+                <span id="user-email-display" class="text-sm text-slate-500 font-medium hidden md:inline"></span>
+                <button id="btn-logout-nav" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+
+            <button id="btn-history" class="text-slate-600 hover:text-primary transition-colors flex items-center gap-2 font-medium">
+                <i class="fas fa-history"></i> <span class="hidden sm:inline" data-i18n="navHistory">歷史紀錄</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Left Column: Input Form -->
+        <aside class="w-full lg:w-1/3 flex flex-col gap-4">
+            <div class="glass-card rounded-2xl p-6">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fas fa-sliders-h text-primary"></i> <span data-i18n="formTitle">規劃條件</span>
+                </h2>
+                
+                <form id="planner-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="destLabel">目的地</label>
+                        <input type="text" id="input-destination" required data-i18n-ph="destPh" placeholder="例如：台南市中西區" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="originLabel">出發地點</label>
+                            <input type="text" id="input-origin" required data-i18n-ph="originPh" placeholder="例如：台南火車站" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="dateLabel">日期</label>
+                            <input type="date" id="input-date" required class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="budgetLabel">總預算 (TWD)</label>
+                            <input type="number" id="input-budget" required min="0" placeholder="3000" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="paxLabel">人數</label>
+                            <input type="number" id="input-pax" required min="1" value="2" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="startLabel">出發時間</label>
+                            <input type="time" id="input-start-time" required value="09:00" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="endLabel">結束時間</label>
+                            <input type="time" id="input-end-time" required value="20:00" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="transportLabel">交通方式</label>
+                        <select id="input-transport" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none bg-white">
+                            <option value="public" data-i18n="transPublic">大眾運輸</option>
+                            <option value="car" data-i18n="transCar">開車</option>
+                            <option value="motorcycle" data-i18n="transMoto">機車</option>
+                            <option value="walk" data-i18n="transWalk">步行</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-700 mb-3" data-i18n="prefTitle">偏好設定</h3>
+                        
+                        <div class="mb-3">
+                            <label class="block text-xs font-medium text-slate-500 mb-1" data-i18n="typeLabel">旅遊類型 (可複選)</label>
+                            <div class="flex flex-wrap gap-2" id="travel-types-container">
+                                <!-- Checkboxes generated dynamically by JS for i18n -->
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1" data-i18n="styleLabel">旅遊風格</label>
+                                <select id="input-style" class="w-full text-sm px-3 py-2 rounded border border-slate-300 bg-white">
+                                    <option value="relax" data-i18n="styleRelax">放鬆慢活</option>
+                                    <option value="packed" data-i18n="stylePacked">充實緊湊</option>
+                                    <option value="photo" data-i18n="stylePhoto">打卡拍照</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1" data-i18n="companionLabel">同行對象</label>
+                                <select id="input-companion" class="w-full text-sm px-3 py-2 rounded border border-slate-300 bg-white">
+                                    <option value="couple" data-i18n="compCouple">情侶</option>
+                                    <option value="solo" data-i18n="compSolo">獨旅</option>
+                                    <option value="friends" data-i18n="compFriends">朋友</option>
+                                    <option value="family" data-i18n="compFamily">家庭(長輩/小孩友善)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1" data-i18n="walkLabel">步行接受度</label>
+                                <select id="input-walking" class="w-full text-sm px-3 py-2 rounded border border-slate-300 bg-white">
+                                    <option value="medium" data-i18n="walkMed">中等</option>
+                                    <option value="low" data-i18n="walkLow">低 (少走路)</option>
+                                    <option value="high" data-i18n="walkHigh">高 (愛走路)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-slate-500 mb-1" data-i18n="indoorLabel">室內/戶外</label>
+                                <select id="input-indoor" class="w-full text-sm px-3 py-2 rounded border border-slate-300 bg-white">
+                                    <option value="balanced" data-i18n="indBalanced">均衡</option>
+                                    <option value="indoor" data-i18n="indIndoor">全室內</option>
+                                    <option value="outdoor" data-i18n="indOutdoor">戶外為主</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-generate" class="w-full mt-4 bg-primary hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-200 transition-all flex justify-center items-center gap-2">
+                        <span id="btn-generate-text" data-i18n="btnGenerate">生成完美行程</span>
+                        <i class="fas fa-magic"></i>
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Right Column: Results Display -->
+        <section class="w-full lg:w-2/3 flex flex-col gap-4">
+            
+            <!-- Default State -->
+            <div id="empty-state" class="glass-card rounded-2xl p-12 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
                 <div class="text-6xl mb-4">🗺️</div>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">準備好展開下一場精彩旅程了嗎？</h3>
-                <p class="text-slate-500 max-w-md text-sm">請在左側填寫您的目的地與喜好設定，AI 將立即為您量身打造最佳一日遊路線、交通導引及雨天備案！</p>
+                <h3 class="text-xl font-bold text-slate-700 mb-2" data-i18n="emptyTitle">等待您的指示</h3>
+                <p class="text-slate-500 max-w-md" data-i18n="emptyDesc">在左側輸入您的目的地、預算與喜好，我們的 AI 規劃師將為您量身打造專屬的一日遊行程，包含時間軸、交通與雨天備案！</p>
             </div>
 
             <!-- Loading State -->
-            <div id="loadingState" class="hidden bg-white/80 backdrop-blur-md rounded-2xl p-12 border border-slate-200 text-center flex flex-col items-center justify-center flex-grow shadow-sm">
-                <div class="animate-spin text-5xl mb-4">⏳</div>
-                <h3 class="text-lg font-bold text-slate-800 mb-1">AI 旅行規劃師正在精心規劃中...</h3>
-                <p class="text-slate-500 text-sm" id="loadingTip">正在分析地理鄰近性與預算配置...</p>
+            <div id="loading-state" class="hidden glass-card rounded-2xl p-12 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
+                <div class="loader mb-6"></div>
+                <h3 class="text-lg font-bold text-slate-700 mb-2" data-i18n="loadingTitle">AI 規劃師正在燒腦中...</h3>
+                <p class="text-slate-500 text-sm" data-i18n="loadingDesc">正在考慮地理鄰近性、計算預算與準備雨天備案</p>
             </div>
 
-            <!-- Result Display Container -->
-            <div id="resultContainer" class="hidden space-y-6">
-                <!-- Summary Card -->
-                <div class="bg-gradient-to-r from-indigo-900 to-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 text-9xl transform translate-x-4 -translate-y-4">✈️</div>
-                    <div class="relative z-10">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="bg-indigo-500/30 text-indigo-200 px-3 py-1 rounded-full text-xs font-semibold" id="resDestinationBadge">台南市</span>
-                                <h2 class="text-2xl font-bold mt-2" id="resTripTitle">載入中...</h2>
-                            </div>
-                            <button onclick="saveCurrentItinerary()" id="saveBtn" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-4 py-2 rounded-xl text-sm transition flex items-center space-x-1 shadow">
-                                <span>💾 儲存行程</span>
-                            </button>
+            <!-- Results State -->
+            <div id="results-state" class="hidden flex-col gap-6">
+                <!-- Header -->
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-secondary opacity-10 rounded-bl-full -z-10"></div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 id="res-title" class="text-2xl font-bold text-slate-800 mb-2"></h2>
+                            <p id="res-summary" class="text-slate-600 mb-4"></p>
                         </div>
-                        <p class="text-slate-300 text-sm mt-3" id="resSummary">...</p>
-                        <p class="text-indigo-300 text-xs italic mt-2" id="resAiNotes">...</p>
+                        <button id="btn-save" class="bg-white border border-slate-200 hover:border-primary text-slate-700 hover:text-primary px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-sm flex items-center gap-2">
+                            <i class="far fa-bookmark"></i> <span id="btn-save-text" data-i18n="btnSave">儲存</span>
+                        </button>
+                    </div>
+                    
+                    <!-- Budget Summary -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-2 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium" data-i18n="budgetTotal">總預算估算</p>
+                            <p class="text-lg font-bold text-primary" id="res-budget-total">$0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium" data-i18n="budgetFood">餐飲</p>
+                            <p class="text-md font-semibold text-slate-700" id="res-budget-food">$0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium" data-i18n="budgetTicket">門票/活動</p>
+                            <p class="text-md font-semibold text-slate-700" id="res-budget-tickets">$0</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium" data-i18n="budgetMisc">交通/其他</p>
+                            <p class="text-md font-semibold text-slate-700" id="res-budget-misc">$0</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-500 flex items-start gap-1">
+                        <i class="fas fa-info-circle mt-0.5"></i>
+                        <span id="res-ai-notes"></span>
                     </div>
                 </div>
 
-                <!-- Budget Summary Card -->
-                <div class="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-slate-200 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center justify-between">
-                        <span>💰 預算估算明細 (TWD)</span>
-                        <span class="text-indigo-600 font-semibold" id="budgetTotalText">總計: $0</span>
+                <!-- Timeline -->
+                <div class="glass-card rounded-2xl p-6">
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                        <i class="far fa-clock text-primary"></i> <span data-i18n="timelineTitle">行程時間軸</span>
                     </h3>
-                    <div class="grid grid-cols-4 gap-2 text-center text-xs">
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <span class="block text-slate-500">餐飲</span>
-                            <strong class="text-slate-800 text-sm" id="budgetFood">$0</strong>
-                        </div>
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <span class="block text-slate-500">門票/活動</span>
-                            <strong class="text-slate-800 text-sm" id="budgetTickets">$0</strong>
-                        </div>
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <span class="block text-slate-500">交通</span>
-                            <strong class="text-slate-800 text-sm" id="budgetTransport">$0</strong>
-                        </div>
-                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                            <span class="block text-slate-500">其他雜項</span>
-                            <strong class="text-slate-800 text-sm" id="budgetMisc">$0</strong>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Timeline Schedule -->
-                <div class="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200 shadow-sm">
-                    <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center">
-                        <span class="mr-2">⏰</span> 精準一日時間軸行程
-                    </h3>
-                    <div class="space-y-6 relative border-l-2 border-indigo-100 ml-3 pl-6" id="timelineList">
-                        <!-- Timeline items injected dynamically -->
+                    
+                    <div class="relative border-l-2 border-indigo-100 ml-3 md:ml-4 space-y-8" id="timeline-container">
+                        <!-- Timeline items injected here -->
                     </div>
                 </div>
             </div>
@@ -209,539 +283,734 @@
         </section>
     </main>
 
-    <!-- Auth Modal -->
-    <div id="authModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative space-y-5">
-            <div class="flex justify-between items-center border-b border-slate-200 pb-3">
-                <h3 class="font-bold text-lg text-slate-800">🔐 帳號登入與註冊</h3>
-                <button onclick="toggleAuthModal(false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">&times;</button>
-            </div>
-
-            <!-- Tab Switcher -->
-            <div class="flex bg-slate-100 p-1 rounded-xl text-sm font-semibold">
-                <button onclick="switchAuthTab('signin')" id="tabSignIn" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-indigo-600 transition">登入</button>
-                <button onclick="switchAuthTab('signup')" id="tabSignUp" class="flex-1 py-2 rounded-lg text-slate-600 transition">註冊新帳號</button>
-            </div>
-
-            <!-- Email Form -->
-            <form id="emailAuthForm" onsubmit="handleEmailAuth(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">電子郵件</label>
-                    <input type="email" id="authEmail" required placeholder="name@example.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">密碼</label>
-                    <input type="password" id="authPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                </div>
-                <button type="submit" id="emailAuthSubmitBtn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition shadow">登入帳號</button>
-            </form>
-
-            <div class="relative flex py-1 items-center">
-                <div class="flex-grow border-t border-slate-200"></div>
-                <span class="flex-shrink mx-4 text-xs text-slate-400 uppercase">或者使用其他方式</span>
-                <div class="flex-grow border-t border-slate-200"></div>
-            </div>
-
-            <!-- Alternative Auth Buttons -->
-            <div class="space-y-2.5">
-                <button onclick="handleGoogleLogin()" class="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-sm">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.13 0-5.78-2.11-6.73-4.96H1.18v3.15C3.15 21.32 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.24c-.25-.72-.38-1.5-.38-2.24s.13-1.52.38-2.24V6.6H1.18C.43 8.13 0 9.87 0 12s.43 3.87 1.18 5.4l4.09-3.16z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.15 2.68 1.18 6.6l4.09 3.15c.95-2.85 3.6-4.96 6.73-4.96z"/></svg>
-                    <span>使用 Google 帳號登入</span>
-                </button>
-                <button onclick="handleAnonymousLogin()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center justify-center space-x-2">
-                    <span>👻 訪客快速匿名登入</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- History Modal -->
-    <div id="historyModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-            <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-                <h3 class="font-bold text-lg text-slate-800">📜 歷史儲存行程</h3>
-                <button onclick="toggleHistoryModal(false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold px-2">&times;</button>
-            </div>
-            <div class="p-6 overflow-y-auto space-y-4 flex-grow" id="historyListContainer">
-                <p class="text-slate-500 text-center py-8">正在載入歷史行程...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Message Modal -->
-    <div id="msgModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4">
-            <div id="msgIcon" class="text-4xl">✨</div>
-            <h4 id="msgTitle" class="font-bold text-lg text-slate-800">提示</h4>
-            <p id="msgText" class="text-sm text-slate-600">訊息內容</p>
-            <button onclick="closeMsgModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-sm transition">確定</button>
-        </div>
-    </div>
-
-    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-        © 2020 TonyStudio (TONY 楊文澤顧問). All rights reserved.
+    <footer class="py-6 text-center text-slate-400 text-sm">
+        <p>© 2026 TonyStudio (TONY 楊文澤顧問). All rights reserved.</p>
     </footer>
+
+    <!-- Modals -->
+    <div id="alert-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl transform transition-all">
+            <h3 id="alert-title" class="text-lg font-bold text-slate-800 mb-2">通知</h3>
+            <p id="alert-message" class="text-slate-600 mb-6">訊息內容</p>
+            <button id="alert-close" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-medium py-2 rounded-lg transition-colors" data-i18n="modalConfirm">確認</button>
+        </div>
+    </div>
+
+    <!-- History Drawer -->
+    <div id="history-drawer" class="hidden fixed inset-0 z-[90] flex justify-end">
+        <div id="history-backdrop" class="absolute inset-0 bg-slate-900/30 backdrop-blur-sm"></div>
+        <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-slide-in">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-slate-800" data-i18n="historyTitle">歷史行程紀錄</h2>
+                <button id="history-close" class="text-slate-400 hover:text-slate-700 p-2"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+                <div class="text-center text-slate-500 py-10" data-i18n="historyEmpty">尚無儲存的行程紀錄</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl relative transform transition-all">
+            <button id="auth-close" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700"><i class="fas fa-times text-xl"></i></button>
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center" data-i18n="authTitle">登入 / 註冊</h2>
+            
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="authEmail">電子郵件</label>
+                    <input type="email" id="auth-email" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-600 mb-1" data-i18n="authPassword">密碼</label>
+                    <input type="password" id="auth-password" class="w-full px-4 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary outline-none transition-all">
+                </div>
+                <div class="flex gap-3">
+                    <button id="btn-email-signin" class="flex-1 bg-primary hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition-colors shadow-sm" data-i18n="btnSignIn">登入</button>
+                    <button id="btn-email-signup" class="flex-1 bg-white border border-slate-300 hover:border-primary text-slate-700 font-bold py-2 px-4 rounded-lg transition-colors shadow-sm" data-i18n="btnSignUp">註冊</button>
+                </div>
+            </div>
+            
+            <div class="relative flex py-2 items-center mb-6">
+                <div class="flex-grow border-t border-slate-200"></div>
+                <span class="flex-shrink-0 mx-4 text-slate-400 text-sm font-medium">OR</span>
+                <div class="flex-grow border-t border-slate-200"></div>
+            </div>
+            
+            <div class="space-y-3">
+                <button id="btn-google-login" class="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-2.5 px-4 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-3">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5" alt="Google">
+                    <span data-i18n="authGoogle">使用 Google 登入</span>
+                </button>
+                <button id="btn-guest-login" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-2.5 px-4 rounded-lg transition-colors" data-i18n="authGuest">以訪客繼續 (匿名)</button>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { 
-            getAuth, 
-            signInAnonymously, 
-            signInWithCustomToken, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            signOut, 
-            onAuthStateChanged 
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'travel-planner-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        
-        let app, db, auth, userId = null;
-        let currentItineraryData = null;
-        let authMode = 'signin'; // 'signin' or 'signup'
+        // User provided Firebase Config
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'travel-planner-vibe';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxj2zgJ7P24Ro30RKgPcye7P4NOXd9ghE",
+            authDomain: "water-520ed.firebaseapp.com",
+            projectId: "water-520ed",
+            storageBucket: "water-520ed.firebasestorage.app",
+            messagingSenderId: "275145326722",
+            appId: "1:275145326722:web:ff98b8b5ee00da8b0db49b",
+            measurementId: "G-RSTZ49QJWQ"
+        };
 
-        async function initFirebase() {
+        let db = null;
+        let auth = null;
+        let currentUserId = null;
+        let isFirebaseActive = Object.keys(firebaseConfig).length > 0;
+
+        if (isFirebaseActive) {
             try {
-                if (Object.keys(firebaseConfig).length > 0) {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // Enhanced Auth Flow handling Custom Token Mismatches gracefully
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    try {
                         await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
+                    } catch (tokenError) {
+                        console.warn("Custom token validation failed, falling back to anonymous auth.", tokenError);
                         await signInAnonymously(auth);
                     }
-
-                    onAuthStateChanged(auth, (user) => {
-                        const emailBadge = document.getElementById('userInfoBadge');
-                        const emailDisplay = document.getElementById('userEmailDisplay');
-                        const loginBtn = document.getElementById('loginOpenBtn');
-
-                        if (user) {
-                            userId = user.uid;
-                            const identifier = user.isAnonymous ? `訪客 (${user.uid.substring(0, 6)}...)` : (user.email || '已登入會員');
-                            emailDisplay.innerText = identifier;
-                            emailBadge.classList.remove('hidden');
-                            loginBtn.classList.add('hidden');
-                        } else {
-                            userId = null;
-                            emailBadge.classList.add('hidden');
-                            loginBtn.classList.remove('hidden');
-                        }
-                    });
-                }
-            } catch (err) {
-                console.warn("Firebase initialization warning (running local-only mode):", err);
-                userId = crypto.randomUUID();
-            }
-        }
-        initFirebase();
-
-        // UI Modal Helpers (Replacing alert/confirm)
-        window.showMsg = function(title, text, icon = "✨") {
-            document.getElementById('msgTitle').innerText = title;
-            document.getElementById('msgText').innerText = text;
-            document.getElementById('msgIcon').innerText = icon;
-            document.getElementById('msgModal').classList.remove('hidden');
-        }
-
-        window.closeMsgModal = function() {
-            document.getElementById('msgModal').classList.add('hidden');
-        }
-
-        window.toggleAuthModal = function(show) {
-            const modal = document.getElementById('authModal');
-            if (show) {
-                modal.classList.remove('hidden');
-            } else {
-                modal.classList.add('hidden');
-            }
-        }
-
-        window.switchAuthTab = function(mode) {
-            authMode = mode;
-            const tabSignIn = document.getElementById('tabSignIn');
-            const tabSignUp = document.getElementById('tabSignUp');
-            const submitBtn = document.getElementById('emailAuthSubmitBtn');
-
-            if (mode === 'signin') {
-                tabSignIn.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-indigo-600 transition';
-                tabSignUp.className = 'flex-1 py-2 rounded-lg text-slate-600 transition';
-                submitBtn.innerText = '登入帳號';
-            } else {
-                tabSignUp.className = 'flex-1 py-2 rounded-lg bg-white shadow-sm text-indigo-600 transition';
-                tabSignIn.className = 'flex-1 py-2 rounded-lg text-slate-600 transition';
-                submitBtn.innerText = '註冊帳號';
-            }
-        }
-
-        // Auth Operations
-        window.handleEmailAuth = async function(e) {
-            e.preventDefault();
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-
-            try {
-                if (!auth) throw new Error("Firebase Auth 未初始化");
-                if (authMode === 'signin') {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    showMsg('登入成功', `歡迎回來，${email}！`, '🎉');
                 } else {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    showMsg('註冊成功', `帳號已成功建立並登入！`, '🎉');
+                    await signInAnonymously(auth);
                 }
-                toggleAuthModal(false);
+                currentUserId = auth.currentUser?.uid;
+                setupAuthListeners();
             } catch (error) {
-                console.error("Auth error:", error);
-                showMsg('認證失敗', error.message, '❌');
+                console.error("Firebase init failed", error);
+                isFirebaseActive = false;
             }
         }
-
-        window.handleGoogleLogin = async function() {
-            try {
-                if (!auth) throw new Error("Firebase Auth 未初始化");
-                const provider = new GoogleAuthProvider();
-                await signInWithPopup(auth, provider);
-                showMsg('登入成功', '已透過 Google 帳號成功登入！', '🎉');
-                toggleAuthModal(false);
-            } catch (error) {
-                console.error("Google Auth error:", error);
-                showMsg('Google 登入失敗', error.message, '❌');
-            }
-        }
-
-        window.handleAnonymousLogin = async function() {
-            try {
-                if (!auth) throw new Error("Firebase Auth 未初始化");
-                await signInAnonymously(auth);
-                showMsg('訪客登入成功', '您已以訪客身分快速開始使用！', '✨');
-                toggleAuthModal(false);
-            } catch (error) {
-                console.error("Anonymous login error:", error);
-                showMsg('登入失敗', error.message, '❌');
-            }
-        }
-
-        window.logout = async function() {
-            try {
-                if (auth) {
-                    await signOut(auth);
-                    showMsg('已登出', '您已成功登出系統。', '👋');
+        
+        function setupAuthListeners() {
+            onAuthStateChanged(auth, (user) => {
+                const btnLoginNav = document.getElementById('btn-login-nav');
+                const userProfileNav = document.getElementById('user-profile-nav');
+                const userEmailDisplay = document.getElementById('user-email-display');
+                
+                if (user) {
+                    currentUserId = user.uid;
+                    // 若為訪客，顯示登入按鈕；若為已註冊帳號，顯示 email 及登出
+                    if (user.isAnonymous) {
+                        btnLoginNav.classList.remove('hidden');
+                        userProfileNav.classList.add('hidden');
+                        userProfileNav.classList.remove('flex');
+                    } else {
+                        btnLoginNav.classList.add('hidden');
+                        userProfileNav.classList.remove('hidden');
+                        userProfileNav.classList.add('flex');
+                        userEmailDisplay.innerText = user.email || user.displayName || '使用者';
+                    }
+                } else {
+                    currentUserId = null;
+                    btnLoginNav.classList.remove('hidden');
+                    userProfileNav.classList.add('hidden');
+                    userProfileNav.classList.remove('flex');
                 }
-            } catch (err) {
-                console.error("Logout error:", err);
+            });
+        }
+
+        // --- I18N Dictionary ---
+        const i18n = {
+            'zh-TW': {
+                navTitle: '旅行規劃師', navSubtitle: '| Travel Planner Vibe', navHistory: '歷史紀錄',
+                navLogin: '登入', navLogout: '登出',
+                authTitle: '登入 / 註冊', authEmail: '電子郵件', authPassword: '密碼', authGoogle: '使用 Google 登入', authGuest: '以訪客繼續 (匿名)', btnSignIn: '登入', btnSignUp: '註冊',
+                formTitle: '規劃條件', destLabel: '目的地', destPh: '例如：台南市中西區', originLabel: '出發地點', originPh: '例如：台南火車站',
+                dateLabel: '日期', budgetLabel: '總預算 (TWD)', paxLabel: '人數', startLabel: '出發時間', endLabel: '結束時間',
+                transportLabel: '交通方式', prefTitle: '偏好設定', typeLabel: '旅遊類型 (可複選)', styleLabel: '旅遊風格',
+                companionLabel: '同行對象', walkLabel: '步行接受度', indoorLabel: '室內/戶外',
+                btnGenerate: '生成完美行程', genLoading: '生成中...',
+                emptyTitle: '等待您的指示', emptyDesc: '在左側輸入您的目的地、預算與喜好，我們的 AI 規劃師將為您量身打造專屬的一日遊行程，包含時間軸、交通與雨天備案！',
+                loadingTitle: 'AI 規劃師正在燒腦中...', loadingDesc: '正在考慮地理鄰近性、計算預算與準備雨天備案',
+                btnSave: '儲存', btnSaving: '儲存中',
+                budgetTotal: '總預算估算', budgetFood: '餐飲', budgetTicket: '門票/活動', budgetMisc: '交通/其他', timelineTitle: '行程時間軸',
+                modalNotice: '通知', modalConfirm: '確認', historyTitle: '歷史行程紀錄', historyEmpty: '尚無儲存的行程紀錄',
+                alertSelectType: '請至少選擇一種旅遊類型！', alertSaveSuccess: '行程已成功儲存至您的歷史紀錄！', alertSaveFail: '無法儲存行程，請稍後再試。', alertOffline: '目前為單機體驗模式，無法儲存至雲端。',
+                transPublic: '大眾運輸', transCar: '開車', transMoto: '機車', transWalk: '步行',
+                styleRelax: '放鬆慢活', stylePacked: '充實緊湊', stylePhoto: '打卡拍照',
+                compCouple: '情侶', compSolo: '獨旅', compFriends: '朋友', compFamily: '家庭(長輩/小孩友善)',
+                walkMed: '中等', walkLow: '低 (少走路)', walkHigh: '高 (愛走路)',
+                indBalanced: '均衡', indIndoor: '全室內', indOutdoor: '戶外為主',
+                type_food: '美食', type_nature: '自然生態', type_shopping: '購物', type_culture: '文化藝術', type_hipster: '文青探索', type_history: '歷史古蹟',
+                rainyBackupPrefix: '雨天備案: ', mins: '分鐘'
+            },
+            'en': {
+                navTitle: 'Travel Planner', navSubtitle: '| Vibe', navHistory: 'History',
+                navLogin: 'Login', navLogout: 'Logout',
+                authTitle: 'Sign In / Sign Up', authEmail: 'Email', authPassword: 'Password', authGoogle: 'Sign in with Google', authGuest: 'Continue as Guest', btnSignIn: 'Sign In', btnSignUp: 'Sign Up',
+                formTitle: 'Conditions', destLabel: 'Destination', destPh: 'e.g., Kyoto, Japan', originLabel: 'Origin', originPh: 'e.g., Kyoto Station',
+                dateLabel: 'Date', budgetLabel: 'Total Budget (Local)', paxLabel: 'Pax', startLabel: 'Start Time', endLabel: 'End Time',
+                transportLabel: 'Transport', prefTitle: 'Preferences', typeLabel: 'Travel Types (Multiple)', styleLabel: 'Style',
+                companionLabel: 'Companion', walkLabel: 'Walking', indoorLabel: 'Indoor/Outdoor',
+                btnGenerate: 'Generate Itinerary', genLoading: 'Generating...',
+                emptyTitle: 'Awaiting Your Orders', emptyDesc: 'Enter your destination, budget, and preferences on the left. Our AI planner will tailor a 1-day itinerary with timeline, transport, and rainy day backups!',
+                loadingTitle: 'AI is thinking...', loadingDesc: 'Considering proximity, calculating budgets, and preparing backups.',
+                btnSave: 'Save', btnSaving: 'Saving...',
+                budgetTotal: 'Est. Total', budgetFood: 'Food', budgetTicket: 'Tickets', budgetMisc: 'Transport/Misc', timelineTitle: 'Timeline',
+                modalNotice: 'Notice', modalConfirm: 'OK', historyTitle: 'Saved Itineraries', historyEmpty: 'No history found.',
+                alertSelectType: 'Please select at least one travel type!', alertSaveSuccess: 'Itinerary saved successfully!', alertSaveFail: 'Failed to save, please try again.', alertOffline: 'Offline mode: cannot save to cloud.',
+                transPublic: 'Public Transit', transCar: 'Drive', transMoto: 'Scooter/Moto', transWalk: 'Walk',
+                styleRelax: 'Relaxing', stylePacked: 'Action Packed', stylePhoto: 'Photogenic',
+                compCouple: 'Couple', compSolo: 'Solo', compFriends: 'Friends', compFamily: 'Family',
+                walkMed: 'Medium', walkLow: 'Low (Less walking)', walkHigh: 'High (Love walking)',
+                indBalanced: 'Balanced', indIndoor: 'Mostly Indoor', indOutdoor: 'Mostly Outdoor',
+                type_food: 'Food', type_nature: 'Nature', type_shopping: 'Shopping', type_culture: 'Culture', type_hipster: 'Hipster', type_history: 'History',
+                rainyBackupPrefix: 'Rainy Backup: ', mins: 'mins'
+            },
+            'ja': {
+                navTitle: '旅行プランナー', navSubtitle: '| Vibe', navHistory: '履歴',
+                navLogin: 'ログイン', navLogout: 'ログアウト',
+                authTitle: 'ログイン / 登録', authEmail: 'メールアドレス', authPassword: 'パスワード', authGoogle: 'Googleでログイン', authGuest: 'ゲストとして続行', btnSignIn: 'ログイン', btnSignUp: '登録',
+                formTitle: 'プラン条件', destLabel: '目的地', destPh: '例：京都市中京区', originLabel: '出発地', originPh: '例：京都駅',
+                dateLabel: '日付', budgetLabel: '総予算', paxLabel: '人数', startLabel: '出発時間', endLabel: '終了時間',
+                transportLabel: '移動手段', prefTitle: '好み設定', typeLabel: '旅行タイプ (複数可)', styleLabel: 'スタイル',
+                companionLabel: '同行者', walkLabel: '歩く量', indoorLabel: '屋内/屋外',
+                btnGenerate: 'プランを作成', genLoading: '作成中...',
+                emptyTitle: '指示をお待ちしています', emptyDesc: '左側に目的地、予算、好みを入力してください。AIがタイムラインや雨天の代案を含む1日のプランを作成します！',
+                loadingTitle: 'AIプランナーが考え中...', loadingDesc: '地理的近接性、予算、雨天の代案を考慮しています。',
+                btnSave: '保存', btnSaving: '保存中...',
+                budgetTotal: '推定合計', budgetFood: '食事', budgetTicket: 'チケット', budgetMisc: '交通/その他', timelineTitle: 'タイムライン',
+                modalNotice: 'お知らせ', modalConfirm: '確認', historyTitle: '保存されたプラン', historyEmpty: '履歴はありません',
+                alertSelectType: '少なくとも1つの旅行タイプを選択してください！', alertSaveSuccess: 'プランを履歴に保存しました！', alertSaveFail: '保存に失敗しました。', alertOffline: 'オフラインモードのため保存できません。',
+                transPublic: '公共交通', transCar: '車', transMoto: 'バイク', transWalk: '徒歩',
+                styleRelax: 'リラックス', stylePacked: '充実・タイト', stylePhoto: '写真映え',
+                compCouple: 'カップル', compSolo: '一人旅', compFriends: '友達', compFamily: '家族',
+                walkMed: '普通', walkLow: '少ない', walkHigh: '多い',
+                indBalanced: 'バランス', indIndoor: '屋内中心', indOutdoor: '屋外中心',
+                type_food: 'グルメ', type_nature: '自然', type_shopping: '買い物', type_culture: '文化', type_hipster: 'カフェ巡り', type_history: '歴史',
+                rainyBackupPrefix: '雨天代案: ', mins: '分'
+            },
+            'ko': {
+                navTitle: '여행 플래너', navSubtitle: '| Vibe', navHistory: '기록',
+                navLogin: '로그인', navLogout: '로그아웃',
+                authTitle: '로그인 / 가입', authEmail: '이메일', authPassword: '비밀번호', authGoogle: 'Google 로그인', authGuest: '게스트로 계속', btnSignIn: '로그인', btnSignUp: '가입하기',
+                formTitle: '계획 조건', destLabel: '목적지', destPh: '예: 서울 종로구', originLabel: '출발지', originPh: '예: 서울역',
+                dateLabel: '날짜', budgetLabel: '총 예산', paxLabel: '인원', startLabel: '출발 시간', endLabel: '종료 시간',
+                transportLabel: '교통수단', prefTitle: '선호도', typeLabel: '여행 유형 (다중선택)', styleLabel: '여행 스타일',
+                companionLabel: '동행자', walkLabel: '걷기 선호도', indoorLabel: '실내/야외',
+                btnGenerate: '일정 생성하기', genLoading: '생성 중...',
+                emptyTitle: '명령을 기다리는 중', emptyDesc: '목적지, 예산, 선호도를 입력하세요. AI가 타임라인, 교통, 우천 시 대안을 포함한 1일 일정을 만들어 드립니다!',
+                loadingTitle: 'AI가 생각하는 중...', loadingDesc: '거리, 예산, 우천 시 대안을 고려하고 있습니다.',
+                btnSave: '저장', btnSaving: '저장 중...',
+                budgetTotal: '총 예산 추정', budgetFood: '식비', budgetTicket: '입장료', budgetMisc: '교통/기타', timelineTitle: '일정 타임라인',
+                modalNotice: '알림', modalConfirm: '확인', historyTitle: '저장된 일정 기록', historyEmpty: '저장된 기록이 없습니다',
+                alertSelectType: '여행 유형을 하나 이상 선택하세요!', alertSaveSuccess: '일정이 성공적으로 저장되었습니다!', alertSaveFail: '저장에 실패했습니다.', alertOffline: '오프라인 모드입니다.',
+                transPublic: '대중교통', transCar: '자동차', transMoto: '스쿠터/오토바이', transWalk: '도보',
+                styleRelax: '여유롭게', stylePacked: '알차게', stylePhoto: '사진 명소',
+                compCouple: '커플', compSolo: '혼자', compFriends: '친구', compFamily: '가족',
+                walkMed: '보통', walkLow: '적게', walkHigh: '많이',
+                indBalanced: '균형', indIndoor: '실내 위주', indOutdoor: '야외 위주',
+                type_food: '음식', type_nature: '자연', type_shopping: '쇼핑', type_culture: '문화', type_hipster: '힙스터', type_history: '역사',
+                rainyBackupPrefix: '우천 대안: ', mins: '분'
+            }
+        };
+
+        const langPromptMap = {
+            'zh-TW': 'Traditional Chinese (zh-TW)',
+            'en': 'English',
+            'ja': 'Japanese',
+            'ko': 'Korean'
+        };
+
+        let currentLang = 'zh-TW';
+        let currentGeneratedItinerary = null;
+
+        // --- Streamlined UI Updates & Translation Applier ---
+        function applyTranslations(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[lang][key]) {
+                    el.innerText = i18n[lang][key];
+                }
+            });
+            document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+                const key = el.getAttribute('data-i18n-ph');
+                if (i18n[lang][key]) {
+                    el.placeholder = i18n[lang][key];
+                }
+            });
+
+            // Re-render itinerary if it exists to refresh dynamic lang items
+            if(currentGeneratedItinerary && !document.getElementById('results-state').classList.contains('hidden')) {
+                renderItinerary(currentGeneratedItinerary);
             }
         }
 
-        window.toggleHistoryModal = async function(show) {
-            const modal = document.getElementById('historyModal');
-            if (show) {
-                modal.classList.remove('hidden');
-                await loadHistoryItems();
-            } else {
-                modal.classList.add('hidden');
+        document.getElementById('lang-switcher').addEventListener('change', (e) => {
+            applyTranslations(e.target.value);
+        });
+
+        // --- DOM Elements & Dynamic Checkboxes ---
+        const form = document.getElementById('planner-form');
+        const typesContainer = document.getElementById('travel-types-container');
+        const btnGenerateText = document.getElementById('btn-generate-text');
+        const btnGenerate = document.getElementById('btn-generate');
+        const btnSaveText = document.getElementById('btn-save-text');
+        const btnSave = document.getElementById('btn-save');
+        const emptyState = document.getElementById('empty-state');
+        const loadingState = document.getElementById('loading-state');
+        const resultsState = document.getElementById('results-state');
+
+        const travelTypesDefs = ['type_food', 'type_nature', 'type_shopping', 'type_culture', 'type_hipster', 'type_history'];
+        travelTypesDefs.forEach(typeKey => {
+            const label = document.createElement('label');
+            label.className = "inline-flex items-center cursor-pointer border border-slate-200 rounded-full px-3 py-1 text-sm bg-white hover:bg-slate-50 transition-colors select-none has-[:checked]:bg-indigo-50 has-[:checked]:border-indigo-300 has-[:checked]:text-indigo-700";
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = "checkbox";
+            checkbox.value = typeKey;
+            checkbox.className = "hidden peer type-checkbox";
+            if(typeKey === 'type_food' || typeKey === 'type_culture') checkbox.checked = true;
+
+            const span = document.createElement('span');
+            span.setAttribute('data-i18n', typeKey);
+            span.innerText = i18n[currentLang][typeKey];
+
+            label.appendChild(checkbox);
+            label.appendChild(span);
+            typesContainer.appendChild(label);
+        });
+
+        // Default date
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('input-date').value = tomorrow.toISOString().split('T')[0];
+
+        function showAlert(titleKey, messageStr, raw = false) {
+            document.getElementById('alert-title').innerText = i18n[currentLang][titleKey] || titleKey;
+            document.getElementById('alert-message').innerText = raw ? messageStr : (i18n[currentLang][messageStr] || messageStr);
+            document.getElementById('alert-modal').classList.remove('hidden');
+        }
+        document.getElementById('alert-close').addEventListener('click', () => {
+            document.getElementById('alert-modal').classList.add('hidden');
+        });
+
+        // --- STREAMING_CHUNK:Gemini API Calling & Prompt Construction ---
+        async function fetchItineraryFromGemini(params) {
+            const apiKey = ""; // Canvas runtime injects key
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+            const targetLangName = langPromptMap[currentLang];
+
+            const systemPrompt = `You are a professional "Travel Planner". Create a logical, well-paced 1-day itinerary with rainy day backups based on user inputs.
+Rules:
+1. Respect geographic proximity to avoid backtracking.
+2. Ensure realistic budget and time estimates. If constraints conflict, balance them and explain in aiNotes.
+3. STRICT JSON SCHEMA: Do NOT include markdown blocks (\`\`\`json). Output raw JSON.
+4. CRITICAL: The entire JSON output MUST be in ${targetLangName}.
+
+JSON Schema:
+{
+  "tripTitle": "String",
+  "summary": "String",
+  "budgetSummary": {
+    "totalEstimated": Number,
+    "food": Number,
+    "tickets": Number,
+    "transport": Number,
+    "misc": Number
+  },
+  "aiNotes": "String (Suggestions or compromise notes)",
+  "timeline": [
+    {
+      "time": "String (e.g., 09:30 - 11:00)",
+      "spotName": "String",
+      "category": "String (food/culture/nature/shopping etc)",
+      "costEstimate": Number,
+      "description": "String (Details and tips)",
+      "transportToNext": {
+        "mode": "String",
+        "durationMinutes": Number,
+        "note": "String"
+      },
+      "rainyBackup": {
+        "spotName": "String",
+        "reason": "String"
+      }
+    }
+  ]
+}`;
+
+            // We use raw option values in english to make the prompt robust
+            const userPrompt = `Generate a 1-day itinerary:
+- Destination: ${params.destination}
+- Origin: ${params.origin}
+- Date: ${params.date}
+- Total Budget: ${params.budget}
+- Pax: ${params.pax}
+- Start Time: ${params.startTime}
+- End Time: ${params.endTime}
+- Transport: ${params.transport}
+- Preferences (Types): ${params.types.join(', ')}
+- Style: ${params.style}
+- Companion: ${params.companion}
+- Walking Tolerance: ${params.walking}
+- Indoor/Outdoor: ${params.indoor}
+Please reply in ${targetLangName}.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                if (response.status === 429) throw new Error("API Rate Limit exceeded (429). Please try again in 30 seconds.");
+                throw new Error("Failed to generate itinerary.");
+            }
+
+            const result = await response.json();
+            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!text) throw new Error("Empty response from AI");
+
+            try {
+                const cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
+                return JSON.parse(cleanText);
+            } catch (e) {
+                console.error("JSON Parse Error:", e, text);
+                throw new Error("Invalid JSON format from AI.");
             }
         }
 
-        // Form submission handling
-        document.getElementById('plannerForm').addEventListener('submit', async (e) => {
+        // --- STREAMING_CHUNK:Rendering Results into the DOM ---
+        function renderItinerary(data) {
+            document.getElementById('res-title').innerText = data.tripTitle || "Your Itinerary";
+            document.getElementById('res-summary').innerText = data.summary || "";
+            
+            document.getElementById('res-budget-total').innerText = `$${data.budgetSummary?.totalEstimated || 0}`;
+            document.getElementById('res-budget-food').innerText = `$${data.budgetSummary?.food || 0}`;
+            document.getElementById('res-budget-tickets').innerText = `$${data.budgetSummary?.tickets || 0}`;
+            document.getElementById('res-budget-misc').innerText = `$${(data.budgetSummary?.transport || 0) + (data.budgetSummary?.misc || 0)}`;
+            
+            document.getElementById('res-ai-notes').innerText = data.aiNotes || "";
+
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = '';
+            const t = i18n[currentLang];
+
+            if (!data.timeline || !Array.isArray(data.timeline)) return;
+
+            data.timeline.forEach((item, index) => {
+                const isLast = index === data.timeline.length - 1;
+                
+                let iconClass = "fa-map-marker-alt";
+                if(item.category.includes("food") || item.category.includes("美食") || item.category.includes("グルメ") || item.category.includes("음식")) iconClass = "fa-utensils";
+                else if(item.category.includes("culture") || item.category.includes("文化") || item.category.includes("문화")) iconClass = "fa-museum";
+                else if(item.category.includes("nature") || item.category.includes("自然") || item.category.includes("자연")) iconClass = "fa-tree";
+                else if(item.category.includes("shopping") || item.category.includes("購物") || item.category.includes("쇼핑")) iconClass = "fa-shopping-bag";
+
+                let transportHtml = '';
+                if (!isLast && item.transportToNext) {
+                    let transIcon = "fa-walking";
+                    if(item.transportToNext.mode.includes("車") || item.transportToNext.mode.includes("car") || item.transportToNext.mode.includes("차")) transIcon = "fa-car";
+                    if(item.transportToNext.mode.includes("機車") || item.transportToNext.mode.includes("moto") || item.transportToNext.mode.includes("バイク")) transIcon = "fa-motorcycle";
+
+                    transportHtml = `
+                        <div class="mt-4 pt-4 border-t border-dashed border-slate-200 flex items-center gap-3 text-sm text-slate-500">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                                <i class="fas ${transIcon}"></i>
+                            </div>
+                            <div>
+                                <span class="font-medium">${item.transportToNext.mode}</span> 
+                                <span class="mx-1">•</span> 
+                                <span>~ ${item.transportToNext.durationMinutes} ${t.mins}</span>
+                                ${item.transportToNext.note ? `<p class="text-xs text-slate-400 mt-0.5">${item.transportToNext.note}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                let backupHtml = '';
+                if (item.rainyBackup && item.rainyBackup.spotName) {
+                    backupHtml = `
+                        <div class="mt-3 bg-blue-50/50 border border-blue-100 rounded-lg p-3 text-sm flex gap-2">
+                            <i class="fas fa-umbrella text-blue-400 mt-0.5"></i>
+                            <div>
+                                <span class="font-semibold text-blue-800">${t.rainyBackupPrefix}${item.rainyBackup.spotName}</span>
+                                <p class="text-blue-600/80 text-xs mt-0.5">${item.rainyBackup.reason}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const itemHtml = `
+                    <div class="relative">
+                        <div class="absolute -left-8 md:-left-9 mt-1.5 w-6 h-6 rounded-full bg-white border-4 border-indigo-200 flex items-center justify-center shadow-sm">
+                            <div class="w-2 h-2 rounded-full bg-primary"></div>
+                        </div>
+                        <div class="bg-white border border-slate-100 rounded-xl p-4 md:p-5 shadow-sm hover:shadow-md transition-shadow">
+                            <div class="flex flex-wrap justify-between items-start gap-2 mb-2">
+                                <div>
+                                    <span class="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded-md mb-2">
+                                        <i class="far fa-clock mr-1"></i> ${item.time}
+                                    </span>
+                                    <h4 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <i class="fas ${iconClass} text-secondary text-base"></i>
+                                        ${item.spotName}
+                                    </h4>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-sm font-bold text-slate-700 bg-amber-50 px-2 py-1 rounded text-amber-700">
+                                        $${item.costEstimate || 0}
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-slate-600 text-sm mt-2 leading-relaxed">${item.description || ''}</p>
+                            ${backupHtml}
+                            ${transportHtml}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        // --- STREAMING_CHUNK:Event Listeners & Submit Handling ---
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const destination = document.getElementById('destination').value.trim();
-            const tripDate = document.getElementById('tripDate').value;
-            const budgetTotal = document.getElementById('budgetTotal').value;
-            const pax = document.getElementById('pax').value;
-            const origin = document.getElementById('origin').value.trim();
-            const transportMode = document.getElementById('transportMode').value;
-            const departureTime = document.getElementById('departureTime').value;
-            const returnTime = document.getElementById('returnTime').value;
-            const travelStyle = document.getElementById('travelStyle').value;
-            const companion = document.getElementById('companion').value;
-
-            const travelTypes = Array.from(document.querySelectorAll('input[name="travelTypes"]:checked')).map(cb => cb.value);
-
-            if (!destination) {
-                showMsg('欄位未填', '請輸入目的地名稱！', '⚠️');
+            const selectedTypes = Array.from(document.querySelectorAll('.type-checkbox:checked')).map(cb => cb.value);
+            if (selectedTypes.length === 0) {
+                showAlert('modalNotice', 'alertSelectType');
                 return;
             }
 
-            // Switch views
-            document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('loadingState').classList.remove('hidden');
+            const params = {
+                destination: document.getElementById('input-destination').value,
+                origin: document.getElementById('input-origin').value,
+                date: document.getElementById('input-date').value,
+                budget: document.getElementById('input-budget').value,
+                pax: document.getElementById('input-pax').value,
+                startTime: document.getElementById('input-start-time').value,
+                endTime: document.getElementById('input-end-time').value,
+                transport: document.getElementById('input-transport').value,
+                types: selectedTypes,
+                style: document.getElementById('input-style').value,
+                companion: document.getElementById('input-companion').value,
+                walking: document.getElementById('input-walking').value,
+                indoor: document.getElementById('input-indoor').value
+            };
 
-            const promptText = `請針對以下條件為我規劃一個「單日精準一日遊」行程：
-- 目的地：${destination}
-- 出發起點：${origin}
-- 日期：${tripDate} (${departureTime} 至 ${returnTime})
-- 人數：${pax} 人
-- 總預算：${budgetTotal} TWD
-- 交通方式：${transportMode}
-- 偏好類型：${travelTypes.join(', ')}
-- 旅遊風格：${travelStyle}
-- 同行對象：${companion}
-
-請嚴格以純 JSON 格式回傳（不要包含任何 markdown 程式碼區塊語法，直接輸出合法的 JSON），符合下列結構：
-{
-  "tripTitle": "...",
-  "summary": "...",
-  "aiNotes": "...",
-  "timeline": [
-    {
-      "time": "09:30 - 11:00",
-      "spotName": "...",
-      "category": "...",
-      "estimatedCost": 200,
-      "description": "...",
-      "transportToNext": {
-        "mode": "${transportMode}",
-        "durationMinutes": 15,
-        "note": "..."
-      },
-      "rainyBackup": {
-        "spotName": "...",
-        "reason": "..."
-      }
-    }
-  ],
-  "budgetSummary": {
-    "totalEstimated": 2500,
-    "food": 1200,
-    "tickets": 400,
-    "transport": 300,
-    "misc": 600
-  }
-}`;
+            emptyState.classList.add('hidden');
+            resultsState.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            btnGenerate.disabled = true;
+            btnGenerateText.innerText = i18n[currentLang]['genLoading'];
 
             try {
-                const apiKey = "";
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ role: 'user', parts: [{ text: promptText }] }]
-                    })
-                });
-
-                const result = await response.json();
-                const candidate = result.candidates?.[0];
-                if (!candidate || !candidate.content?.parts?.[0]?.text) {
-                    throw new Error("AI 回應格式異常");
+                let data = null;
+                try {
+                    data = await fetchItineraryFromGemini(params);
+                } catch (err) {
+                    console.warn("Retrying due to API error...", err);
+                    data = await fetchItineraryFromGemini(params);
                 }
 
-                let rawText = candidate.content.parts[0].text.trim();
-                rawText = rawText.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '');
-
-                const parsedData = JSON.parse(rawText);
-                currentItineraryData = {
-                    createdAt: new Date().toISOString(),
-                    metadata: { destination, date: tripDate, origin, pax, budgetTotal, transportMode, departureTime, returnTime, travelTypes, travelStyle, companion },
-                    ...parsedData
-                };
-
-                renderItinerary(currentItineraryData);
-
+                currentGeneratedItinerary = { metadata: params, ...data };
+                renderItinerary(data);
+                
+                loadingState.classList.add('hidden');
+                resultsState.classList.remove('hidden');
+                resultsState.classList.add('flex');
             } catch (error) {
-                console.error("Generation error:", error);
-                currentItineraryData = getMockItinerary(destination, budgetTotal, transportMode);
-                renderItinerary(currentItineraryData);
-                showMsg('溫馨提示', '已切換至離線智慧預設行程（網路或 API 忙碌中）。', '💡');
+                console.error("Generate error:", error);
+                showAlert('modalNotice', error.message, true);
+                emptyState.classList.remove('hidden');
+                loadingState.classList.add('hidden');
             } finally {
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('resultContainer').classList.remove('hidden');
+                btnGenerate.disabled = false;
+                btnGenerateText.innerText = i18n[currentLang]['btnGenerate'];
             }
         });
 
-        function getMockItinerary(destination, budget, transport) {
-            return {
-                tripTitle: `${destination} 精彩一日深度探索`,
-                summary: `專為您量身打造的放鬆步調行程，結合在地美食與精選景點。`,
-                aiNotes: `已依據地理鄰近性優化路線，避免舟車勞頓與折返跑。`,
-                timeline: [
-                    {
-                        time: "09:30 - 11:30",
-                        spotName: `${destination} 精選地標漫步`,
-                        category: "文化/景點",
-                        estimatedCost: 150,
-                        description: "探訪當地著名文化古蹟與特色街區，感受獨特人文風情。",
-                        transportToNext: { mode: transport, durationMinutes: 15, note: "沿主干道直行" },
-                        rainyBackup: { spotName: "當地室內文創美術館", reason: "冷氣舒適且雨天不受影響" }
-                    },
-                    {
-                        time: "11:45 - 13:30",
-                        spotName: "在地人氣美景餐廳",
-                        category: "美食/午餐",
-                        estimatedCost: 500,
-                        description: "品嚐在地招牌特色料理，享受愜意悠閒的用餐時光。",
-                        transportToNext: { mode: transport, durationMinutes: 10, note: "步行即可到達" },
-                        rainyBackup: { spotName: "原定餐廳（室內座位）", reason: "不受天候影響" }
-                    },
-                    {
-                        time: "14:00 - 16:30",
-                        spotName: "特色文創園區或市集",
-                        category: "文青/購物",
-                        estimatedCost: 300,
-                        description: "逛逛手作小物、選物店與特色展覽，拍出完美紀念照。",
-                        transportToNext: { mode: transport, durationMinutes: 20, note: "搭乘大眾運輸或騎車前往" },
-                        rainyBackup: { spotName: "大型室內百貨商場", reason: "完善雨天備案" }
-                    },
-                    {
-                        time: "17:30 - 20:00",
-                        spotName: "夜景觀賞與晚餐饗宴",
-                        category: "美食/夜景",
-                        estimatedCost: 700,
-                        description: "在絕佳視野處享用豐盛晚餐，為完美的一日遊畫下句點。",
-                        transportToNext: { mode: "賦歸", durationMinutes: 0, note: "平安回家" },
-                        rainyBackup: { spotName: "景觀室內餐廳", reason: "雨天照樣欣賞浪漫夜景" }
-                    }
-                ],
-                budgetSummary: {
-                    totalEstimated: parseInt(budget) * 0.8,
-                    food: 1200,
-                    tickets: 450,
-                    transport: 300,
-                    misc: 300
-                }
-            };
+        // --- STREAMING_CHUNK:Firebase Save & Load Operations ---
+        btnSave.addEventListener('click', async () => {
+            if (!currentGeneratedItinerary) return;
+            
+            if (!isFirebaseActive || !currentUserId) {
+                showAlert("modalNotice", "alertOffline");
+                return;
+            }
+
+            btnSaveText.innerText = i18n[currentLang]['btnSaving'];
+            btnSave.disabled = true;
+
+            try {
+                const itineraryId = 'itin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                const docRef = doc(db, 'artifacts', appId, 'users', currentUserId, 'itineraries', itineraryId);
+                
+                const docData = {
+                    id: itineraryId,
+                    createdAt: serverTimestamp(),
+                    ...currentGeneratedItinerary
+                };
+
+                await setDoc(docRef, docData);
+                showAlert("modalNotice", "alertSaveSuccess");
+            } catch (error) {
+                console.error("Save error:", error);
+                showAlert("modalNotice", "alertSaveFail");
+            } finally {
+                btnSaveText.innerText = i18n[currentLang]['btnSave'];
+                btnSave.disabled = false;
+            }
+        });
+
+        const historyDrawer = document.getElementById('history-drawer');
+        const historyList = document.getElementById('history-list');
+
+        function toggleHistory(show) {
+            if (show) {
+                historyDrawer.classList.remove('hidden');
+                loadHistory();
+            } else {
+                historyDrawer.classList.add('hidden');
+            }
         }
 
-        function renderItinerary(data) {
-            document.getElementById('resTripTitle').innerText = data.tripTitle || '一日遊行程';
-            document.getElementById('resDestinationBadge').innerText = data.metadata?.destination || '精選目的地';
-            document.getElementById('resSummary').innerText = data.summary || '';
-            document.getElementById('resAiNotes').innerText = `💡 AI 貼心提醒：${data.aiNotes || ''}`;
+        document.getElementById('btn-history').addEventListener('click', () => toggleHistory(true));
+        document.getElementById('history-close').addEventListener('click', () => toggleHistory(false));
+        document.getElementById('history-backdrop').addEventListener('click', () => toggleHistory(false));
 
-            const b = data.budgetSummary || {};
-            document.getElementById('budgetTotalText').innerText = `總計: $${b.totalEstimated || 0} TWD`;
-            document.getElementById('budgetFood').innerText = `$${b.food || 0}`;
-            document.getElementById('budgetTickets').innerText = `$${b.tickets || 0}`;
-            document.getElementById('budgetTransport').innerText = `$${b.transport || 0}`;
-            document.getElementById('budgetMisc').innerText = `$${b.misc || 0}`;
+        // --- Auth Modals & Logic ---
+        const authModal = document.getElementById('auth-modal');
+        const authClose = document.getElementById('auth-close');
+        
+        document.getElementById('btn-login-nav')?.addEventListener('click', () => {
+            authModal.classList.remove('hidden');
+        });
+        
+        authClose?.addEventListener('click', () => {
+            authModal.classList.add('hidden');
+        });
+        
+        document.getElementById('btn-guest-login')?.addEventListener('click', async () => {
+            authModal.classList.add('hidden');
+            if(!auth.currentUser) {
+                await signInAnonymously(auth);
+            }
+        });
 
-            const timelineEl = document.getElementById('timelineList');
-            timelineEl.innerHTML = '';
+        document.getElementById('btn-google-login')?.addEventListener('click', async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                authModal.classList.add('hidden');
+                showAlert('modalNotice', '登入成功！ / Login Successful!', true);
+            } catch (error) {
+                console.error(error);
+                showAlert('modalNotice', error.message, true);
+            }
+        });
 
-            (data.timeline || []).forEach((item, index) => {
-                const node = document.createElement('div');
-                node.className = 'relative pl-2';
-                node.innerHTML = `
-                    <div class="absolute -left-[31px] top-0 w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow">${index + 1}</div>
-                    <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 shadow-sm hover:shadow transition">
-                        <div class="flex flex-wrap justify-between items-center mb-1">
-                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">${item.time}</span>
-                            <span class="text-xs text-slate-500 font-medium">預估花費: $${item.estimatedCost} TWD</span>
+        document.getElementById('btn-email-signin')?.addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            if(!email || !pass) return showAlert('modalNotice', '請輸入電子郵件與密碼 / Enter email & password', true);
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                authModal.classList.add('hidden');
+                showAlert('modalNotice', '登入成功！ / Login Successful!', true);
+            } catch (error) {
+                console.error(error);
+                showAlert('modalNotice', error.message, true);
+            }
+        });
+
+        document.getElementById('btn-email-signup')?.addEventListener('click', async () => {
+            const email = document.getElementById('auth-email').value;
+            const pass = document.getElementById('auth-password').value;
+            if(!email || !pass) return showAlert('modalNotice', '請輸入電子郵件與密碼 / Enter email & password', true);
+            try {
+                await createUserWithEmailAndPassword(auth, email, pass);
+                authModal.classList.add('hidden');
+                showAlert('modalNotice', '註冊成功！ / Signup Successful!', true);
+            } catch (error) {
+                console.error(error);
+                showAlert('modalNotice', error.message, true);
+            }
+        });
+
+        document.getElementById('btn-logout-nav')?.addEventListener('click', async () => {
+            await signOut(auth);
+            // 登出後自動退回匿名狀態以維持應用程式運作
+            await signInAnonymously(auth);
+            showAlert('modalNotice', '已登出。 / Logged out.', true);
+        });
+
+        async function loadHistory() {
+            if (!isFirebaseActive || !currentUserId) {
+                historyList.innerHTML = `<div class="text-center text-slate-500 py-10">${i18n[currentLang]['alertOffline']}</div>`;
+                return;
+            }
+
+            historyList.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-primary text-2xl"></i></div>';
+
+            try {
+                const collRef = collection(db, 'artifacts', appId, 'users', currentUserId, 'itineraries');
+                const snapshot = await getDocs(collRef);
+                
+                if (snapshot.empty) {
+                    historyList.innerHTML = `<div class="text-center text-slate-500 py-10">${i18n[currentLang]['historyEmpty']}</div>`;
+                    return;
+                }
+
+                let items = [];
+                snapshot.forEach(doc => items.push(doc.data()));
+                items.sort((a, b) => {
+                    const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return timeB - timeA;
+                });
+
+                historyList.innerHTML = '';
+                items.forEach(item => {
+                    const dateStr = item.metadata?.date || '-';
+                    const title = item.tripTitle || 'Itinerary';
+                    const card = document.createElement('div');
+                    card.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer";
+                    card.innerHTML = `
+                        <div class="text-xs text-slate-400 mb-1">${dateStr} • ${item.metadata?.destination || '-'}</div>
+                        <h4 class="font-bold text-slate-700">${title}</h4>
+                        <div class="text-xs text-slate-500 mt-2 flex gap-2">
+                            <span><i class="fas fa-coins text-secondary"></i> $${item.budgetSummary?.totalEstimated || 0}</span>
+                            <span><i class="fas fa-users text-indigo-400"></i> ${item.metadata?.pax || 1}</span>
                         </div>
-                        <h4 class="text-base font-bold text-slate-800 mt-1">${item.spotName}</h4>
-                        <p class="text-sm text-slate-600 mt-1">${item.description}</p>
-                        
-                        ${item.transportToNext ? `
-                            <div class="mt-3 pt-3 border-t border-slate-200/60 text-xs text-slate-500 flex items-center space-x-2">
-                                <span>🚗 下段交通：${item.transportToNext.mode} (${item.transportToNext.durationMinutes}分鐘)</span>
-                                <span class="text-slate-400">- ${item.transportToNext.note || ''}</span>
-                            </div>
-                        ` : ''}
-
-                        ${item.rainyBackup ? `
-                            <div class="mt-2 bg-amber-50 border border-amber-200/60 rounded-lg p-2.5 text-xs text-amber-800 flex items-start space-x-2">
-                                <span>☂️</span>
-                                <div>
-                                    <strong>雨天備案：</strong>${item.rainyBackup.spotName} (${item.rainyBackup.reason})
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-                timelineEl.appendChild(node);
-            });
-        }
-
-        window.saveCurrentItinerary = async function() {
-            if (!currentItineraryData) {
-                showMsg('無法儲存', '目前尚無可儲存的行程！', '⚠️');
-                return;
-            }
-
-            try {
-                if (db && userId) {
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'itineraries');
-                    await addDoc(colRef, {
-                        userId: userId,
-                        ...currentItineraryData
+                    `;
+                    card.addEventListener('click', () => {
+                        currentGeneratedItinerary = item;
+                        renderItinerary(item);
+                        emptyState.classList.add('hidden');
+                        loadingState.classList.add('hidden');
+                        resultsState.classList.remove('hidden');
+                        resultsState.classList.add('flex');
+                        toggleHistory(false);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     });
-                    showMsg('儲存成功', '您的行程已成功儲存至雲端資料庫！', '🎉');
-                } else {
-                    const localHistory = JSON.parse(localStorage.getItem('travel_history') || '[]');
-                    localHistory.unshift(currentItineraryData);
-                    localStorage.setItem('travel_history', JSON.stringify(localHistory));
-                    showMsg('儲存成功', '您的行程已成功儲存至本地瀏覽器！', '🎉');
-                }
-            } catch (err) {
-                console.error("Save error:", err);
-                showMsg('儲存失敗', '儲存過程中發生錯誤，請稍後再試。', '❌');
-            }
-        }
-
-        async function loadHistoryItems() {
-            const container = document.getElementById('historyListContainer');
-            container.innerHTML = '<p class="text-slate-500 text-center py-4">讀取中...</p>';
-
-            let items = [];
-            try {
-                if (db) {
-                    const colRef = collection(db, 'artifacts', appId, 'public', 'data', 'itineraries');
-                    const snapshot = await getDocs(colRef);
-                    snapshot.forEach(docSnap => {
-                        items.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                }
-            } catch (e) {
-                console.warn("Firestore read warning:", e);
-            }
-
-            const localHistory = JSON.parse(localStorage.getItem('travel_history') || '[]');
-            if (items.length === 0) {
-                items = localHistory;
-            }
-
-            if (items.length === 0) {
-                container.innerHTML = '<p class="text-slate-500 text-center py-8">尚無任何歷史儲存行程。</p>';
-                return;
-            }
-
-            container.innerHTML = '';
-            items.forEach((item, idx) => {
-                const card = document.createElement('div');
-                card.className = 'bg-slate-50 border border-slate-200 rounded-xl p-4 hover:border-indigo-300 transition flex justify-between items-center';
-                card.innerHTML = `
-                    <div>
-                        <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">${item.metadata?.destination || '目的地'}</span>
-                        <h4 class="font-bold text-slate-800 text-base mt-1">${item.tripTitle || '未命名行程'}</h4>
-                        <p class="text-xs text-slate-500 mt-1">日期: ${item.metadata?.date || '未指定'} | 預算: $${item.metadata?.budgetTotal || 0} TWD</p>
-                    </div>
-                    <button onclick="loadSpecificItinerary(${idx})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-lg transition">查看</button>
-                `;
-                container.appendChild(card);
-            });
-            window._cachedHistory = items;
-        }
-
-        window.loadSpecificItinerary = function(idx) {
-            const items = window._cachedHistory || [];
-            if (items[idx]) {
-                currentItineraryData = items[idx];
-                renderItinerary(currentItineraryData);
-                document.getElementById('emptyState').classList.add('hidden');
-                document.getElementById('loadingState').classList.add('hidden');
-                document.getElementById('resultContainer').classList.remove('hidden');
-                toggleHistoryModal(false);
+                    historyList.appendChild(card);
+                });
+            } catch (error) {
+                console.error("Load history error:", error);
+                historyList.innerHTML = `<div class="text-center text-red-500 py-10">${i18n[currentLang]['alertSaveFail']}</div>`;
             }
         }
     </script>
